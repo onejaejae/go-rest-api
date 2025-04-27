@@ -19,3 +19,7 @@ docker-up:
 # Stop Docker containers
 docker-down:
 	docker-compose -f docker-compose.local.yml down 
+
+# Run migration up
+migration-up:
+	go run ./internal/database/...

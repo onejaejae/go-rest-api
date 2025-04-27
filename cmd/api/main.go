@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"go-rest-api/cmd/api/handlers"
 	"go-rest-api/cmd/api/middlewares"
+	"go-rest-api/cmd/api/validators"
 	"go-rest-api/common"
 	"os"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -21,12 +23,11 @@ type Application struct {
 func main() {
 	e := echo.New()
 	err := godotenv.Load()
-	db, dbErr := common.NewMySql()
-
-	if dbErr != nil {
-		e.Logger.Fatal(dbErr)
+	if err != nil {
+		e.Logger.Fatal(err)
 	}
 
+	db, err := common.NewMySql()
 	if err != nil {
 		e.Logger.Fatal(err)
 	}
@@ -44,6 +45,7 @@ func main() {
 		handler: handler,
 	}
 
+	e.Validator = &validators.CustomValidator{Validator: validator.New()}
 	e.Use(middleware.Logger())
 	e.Use(middlewares.CustomMiddleware)
 

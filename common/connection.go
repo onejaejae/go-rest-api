@@ -13,7 +13,7 @@ import (
 func NewMySql() (*gorm.DB, error) {
 	err := godotenv.Load()
 	if err != nil {
-		panic("error loading .env file")
+		return nil, err
 	}
 
 	dbHost := os.Getenv("DB_HOST")
