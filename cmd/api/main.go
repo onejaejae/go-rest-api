@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"go-rest-api/cmd/api/handlers"
+	"go-rest-api/cmd/api/middlewares"
 	"go-rest-api/common"
 	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type Application struct {
@@ -42,7 +44,10 @@ func main() {
 		handler: handler,
 	}
 
-	e.GET("/", app.handler.HealthCheck)
+	e.Use(middleware.Logger())
+	e.Use(middlewares.CustomMiddleware)
+
+	app.routes()
 
 	e.Logger.Fatal(e.Start(appAddress))
 }
