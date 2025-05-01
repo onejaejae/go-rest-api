@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"go-rest-api/cmd/api/handlers"
-	"go-rest-api/cmd/api/middlewares"
+	"go-rest-api/cmd/api/rotues"
+	"go-rest-api/cmd/api/services"
 	"go-rest-api/cmd/api/validators"
 	"go-rest-api/common"
 	"os"
@@ -13,12 +14,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
-
-type Application struct {
-	logger  echo.Logger
-	server  *echo.Echo
-	handler handlers.Handler
-}
 
 func main() {
 	e := echo.New()
@@ -35,21 +30,14 @@ func main() {
 	appPort := os.Getenv("APP_PORT")
 	appAddress := fmt.Sprintf(":%s", appPort)
 
-	handler := handlers.Handler{
-		DB: db,
-	}
-
-	app := Application{
-		logger:  e.Logger,
-		server:  e,
-		handler: handler,
-	}
+	service := services.NewService(db)
+	handler := handlers.NewHandler(service)
 
 	e.Validator = &validators.CustomValidator{Validator: validator.New()}
 	e.Use(middleware.Logger())
-	e.Use(middlewares.CustomMiddleware)
 
-	app.routes()
+	rotues.RegisterAppRoutes(e, handler.AppHandler)
+	rotues.RegisterAuthRoutes(e, handler.AuthHandler)
 
 	e.Logger.Fatal(e.Start(appAddress))
 }

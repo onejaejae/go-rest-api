@@ -6,7 +6,14 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (h *Handler) HealthCheck(c echo.Context) error {
+type AppHandler struct {
+}
+
+func NewAppHandler() *AppHandler {
+	return &AppHandler{}
+}
+
+func (h *AppHandler) HealthCheck(c echo.Context) error {
 	healthCheckStruct := struct {
 		Health bool `json:"health"`
 	}{
